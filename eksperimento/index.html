@@ -1933,12 +1933,15 @@ function rename_options(data) {
   data.stimulus_lower = data.stimulus_right;
   delete data.stimulus_left;
   delete data.stimulus_right;
+  // the plugin reports which key the response maps to ("e"/"i"); the CSV names
+  // the slot that was chosen. Scoring above has already run on the raw value.
+  data.response = data.response === "e" ? "upper" : "lower";
 }
 
 function last_correct() {
   var data = jsPsych.data.get().last(1).values()[0];
-  return !((jsPsych.pluginAPI.compareKeys(data.stimulus_upper, data.Target) && data.response == "e") ||
-           (jsPsych.pluginAPI.compareKeys(data.stimulus_lower, data.Target) && data.response == "i"));
+  return !((jsPsych.pluginAPI.compareKeys(data.stimulus_upper, data.Target) && data.response == "upper") ||
+           (jsPsych.pluginAPI.compareKeys(data.stimulus_lower, data.Target) && data.response == "lower"));
 }
 
 var error_trial = {
