@@ -1913,6 +1913,7 @@ function maze_word_trial(sent, w, w_idx, tally) {
       var data = jsPsych.data.get().last(1).values()[0];
       data.correct = ((jsPsych.pluginAPI.compareKeys(data.stimulus_left, data.Target) && data.response == "e") ||
                       (jsPsych.pluginAPI.compareKeys(data.stimulus_right, data.Target) && data.response == "i")) ? 1 : 0;
+      rename_options(data);
       data.sentence_id = sent.id;
       data.sentence_type = sent.type;
       data.condition = sent.cond || "";
@@ -1924,10 +1925,20 @@ function maze_word_trial(sent, w, w_idx, tally) {
   };
 }
 
+// The plugin names its two slots left/right, but the phone layout stacks them,
+// so the CSV calls them upper/lower. Renamed once the trial is scored, which is
+// also before last_correct() reads the row back.
+function rename_options(data) {
+  data.stimulus_upper = data.stimulus_left;
+  data.stimulus_lower = data.stimulus_right;
+  delete data.stimulus_left;
+  delete data.stimulus_right;
+}
+
 function last_correct() {
   var data = jsPsych.data.get().last(1).values()[0];
-  return !((jsPsych.pluginAPI.compareKeys(data.stimulus_left, data.Target) && data.response == "e") ||
-           (jsPsych.pluginAPI.compareKeys(data.stimulus_right, data.Target) && data.response == "i"));
+  return !((jsPsych.pluginAPI.compareKeys(data.stimulus_upper, data.Target) && data.response == "e") ||
+           (jsPsych.pluginAPI.compareKeys(data.stimulus_lower, data.Target) && data.response == "i"));
 }
 
 var error_trial = {
@@ -1952,6 +1963,7 @@ function question_trial(sent) {
       var data = jsPsych.data.get().last(1).values()[0];
       data.correct = ((jsPsych.pluginAPI.compareKeys(data.stimulus_left, data.Target) && data.response == "e") ||
                       (jsPsych.pluginAPI.compareKeys(data.stimulus_right, data.Target) && data.response == "i")) ? 1 : 0;
+      rename_options(data);
       data.sentence_id = sent.id;
       data.sentence_type = sent.type;
       data.condition = sent.cond || "";
