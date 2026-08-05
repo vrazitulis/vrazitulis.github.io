@@ -1703,6 +1703,10 @@ var DATAPIPE_CONDITION_URL = "https://pipe.jspsych.org/api/condition/";
 // screen means something is really wrong.
 var UPLOAD_ATTEMPTS = 3;
 
+// Main sentences per block. Drives the break screens, the checkpoint uploads and
+// the block count quoted in the instructions, so change it in one place only.
+var BREAK_EVERY = 24;
+
 // ---------------- data saving ----------------
 
 function render_finish(html) {
@@ -1983,6 +1987,7 @@ function start(list, list_source) {
   sentence_order = maze_practice.concat(make_order());
   total_words = sentence_order.reduce(function(s, x) { return s + x.words.length; }, 0);
   var n_main = sentence_order.length - maze_practice.length;
+  var n_blocks = Math.ceil(n_main / BREAK_EVERY);
   var word_tally = 0;
 
   // consent + background always come first; only the SES block moves
@@ -1996,7 +2001,20 @@ function start(list, list_source) {
     data: { trial1: "instructions" },
     pages: [
       "<b>Bonvenon al la labirinta legeksperimento!</b><br/><br/>Vi legos frazojn po unu vorto.<br/><br/>Sur ĉiu ekrano aperos <b>du vortoj</b>: unu ĝuste daŭrigas la frazon, la alia ne.<br/><br/><b>Tuŝu</b> la vorton, kiu daŭrigas la frazon.<br/><br/>Se vi elektos malĝuste, aperos ruĝa <b style='color:red'>x</b> kaj vi povos provi denove.",
-      "Post kelkaj frazoj aperos <b>demando</b> pri la enhavo &mdash; tuŝu la ĝustan respondon.<br/><br/>Ĉi tiu parto daŭras ĉirkaŭ <b>12&ndash;15 minutojn</b>.<br/><br/>Ni komencos per <b>tri ekzercaj frazoj</b>."
+      "Post kelkaj frazoj aperos <b>demando</b> pri la enhavo &mdash; tuŝu la ĝustan respondon.<br/><br/>Ĉi tiu parto daŭras ĉirkaŭ <b>12&ndash;15 minutojn</b>.",
+      "<b>Antaŭ ol komenci</b><br/><br/>" +
+        "Bonvolu ŝalti sur via telefono la reĝimon <b>&bdquo;Ne ĝeni&ldquo;</b> " +
+        "(en Android: <i>Ne ĝeni</i> / <i>Do Not Disturb</i>; en iPhone: " +
+        "<i>Fokuso &rarr; Ne ĝeni</i>), por ke sciigoj kaj vokoj ne interrompu vin.<br/><br/>" +
+        "Elektu ankaŭ kvietan lokon, kie oni ne parolos al vi dum la sekvaj minutoj.",
+      "La ĉefa parto konsistas el <b>" + n_blocks + " blokoj</b> po ĉirkaŭ <b>" +
+        BREAK_EVERY + " frazoj</b>. Inter la blokoj estas <b>planita paŭzo</b>, " +
+        "kaj ĝi daŭras tiom longe, kiom vi volas &mdash; do vi rajtas tie trinki, " +
+        "movi vin aŭ rigardi vian telefonon.<br/><br/>" +
+        "Sed <b>ene de bloko</b> ni petas vin legi <b>senĉese kaj plene koncentrite</b>: " +
+        "ne paŭzu meze de bloko kaj ne lasu vin distri. Ni mezuras la tempon de ĉiu " +
+        "unuopa vorto, do eĉ mallonga interrompo malutilas al la rezultoj.<br/><br/>" +
+        "Ni komencos per <b>tri ekzercaj frazoj</b>."
     ],
     show_clickable_nav: true,
     allow_backward: true,
@@ -2029,13 +2047,15 @@ function start(list, list_source) {
     timeline.push(between_sentences);
     // break every 24 main sentences
     var main_idx = s_idx - maze_practice.length + 1;
-    if (sent.type !== "practice" && main_idx > 0 && main_idx % 24 === 0 && main_idx < n_main) {
+    if (sent.type !== "practice" && main_idx > 0 && main_idx % BREAK_EVERY === 0 && main_idx < n_main) {
       timeline.push({
         type: jsPsychInstructions,
         data: { trial1: "instructions" },
         // the break screen doubles as a checkpoint: the upload runs behind it
         on_start: upload_checkpoint,
-        pages: ["Vi finis " + main_idx + " el " + n_main + " frazoj.<br/><br/>Vi rajtas mallonge ripozi.<br/><br/>Tuŝu <b>Daŭrigi</b>, kiam vi pretas."],
+        pages: ["Vi finis " + main_idx + " el " + n_main + " frazoj.<br/><br/>" +
+                "Vi rajtas ripozi tiom longe, kiom vi volas.<br/><br/>" +
+                "Tuŝu <b>Daŭrigi</b> nur kiam vi pretas denove legi plene koncentrite."],
         show_clickable_nav: true, allow_backward: false, allow_keys: false,
         button_label_next: "Daŭrigi"
       });
