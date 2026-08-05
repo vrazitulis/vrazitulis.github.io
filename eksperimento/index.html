@@ -2001,6 +2001,12 @@ function start(list, list_source) {
     data: { trial1: "instructions" },
     pages: [
       "<b>Bonvenon al la labirinta legeksperimento!</b><br/><br/>Vi legos frazojn po unu vorto.<br/><br/>Sur ĉiu ekrano aperos <b>du vortoj</b>: unu ĝuste daŭrigas la frazon, la alia ne.<br/><br/><b>Tuŝu</b> la vorton, kiu daŭrigas la frazon.<br/><br/>Se vi elektos malĝuste, aperos ruĝa <b style='color:red'>x</b> kaj vi povos provi denove.",
+      // the standard Maze speed-accuracy instruction (Forster et al. 2009: as fast
+      // as possible, but not so fast that mistakes happen)
+      "Elektu <b>kiel eble plej rapide</b> &mdash; sed ne tiel rapide, ke vi eraras.<br/><br/>" +
+        "Ne longe cerbumu pri unuopa vorto: kutime la ĝusta vorto tuj videblas. " +
+        "Fidu vian unuan impreson kaj legu je via <b>natura legrapido</b>, kvazaŭ vi legus ordinaran tekston.<br/><br/>" +
+        "Ni mezuras, kiom da tempo vi bezonas por ĉiu vorto, do gravas respondi flue kaj sen halti.",
       "Post kelkaj frazoj aperos <b>demando</b> pri la enhavo &mdash; tuŝu la ĝustan respondon.<br/><br/>Ĉi tiu parto daŭras ĉirkaŭ <b>12&ndash;15 minutojn</b>.",
       "<b>Antaŭ ol komenci</b><br/><br/>" +
         "Bonvolu ŝalti sur via telefono la reĝimon <b>&bdquo;Ne ĝeni&ldquo;</b> " +
@@ -2030,7 +2036,8 @@ function start(list, list_source) {
       timeline.push({
         type: jsPsychInstructions,
         data: { trial1: "instructions" },
-        pages: ["Fino de la ekzercado.<br/><br/>Nun komenciĝas la <b>ĉefa parto</b>."],
+        pages: ["Fino de la ekzercado.<br/><br/>Nun komenciĝas la <b>ĉefa parto</b>.<br/><br/>" +
+                "Memoru: elektu <b>rapide sed zorge</b>, sen longa pripensado."],
         show_clickable_nav: true, allow_backward: false, allow_keys: false,
         button_label_next: "Komenci"
       });
