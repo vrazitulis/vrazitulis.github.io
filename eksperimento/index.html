@@ -1895,18 +1895,15 @@ function make_order() {
 // ---------------- trial builders ----------------
 
 function maze_word_trial(sent, w, w_idx, tally) {
+  // Sides are drawn once per word, not per presentation: the redo loop replays
+  // this same trial, and re-drawing would move the correct word under the finger
+  // that just tapped the wrong one. Holds for the "x-x-x" first slot too.
+  var sides = jsPsych.randomization.shuffle([w.t, w.d]);
   return {
     type: jsPsychMazeKeyboard,
     prompt: '<relative><progress id="progress_bar" value="' + tally + '" max="' + total_words + '"></progress></relative>',
     on_start: function(trial) {
-      if (w.d === "x-x-x") {
-        // keep the real word on a random side anyway
-        var r0 = jsPsych.randomization.shuffle([w.t, w.d]);
-        trial.stimulus_left = r0[0]; trial.stimulus_right = r0[1];
-      } else {
-        var r1 = jsPsych.randomization.shuffle([w.t, w.d]);
-        trial.stimulus_left = r1[0]; trial.stimulus_right = r1[1];
-      }
+      trial.stimulus_left = sides[0]; trial.stimulus_right = sides[1];
       trial.Target = w.t; trial.Distractor = w.d;
     },
     choices: ["e", "i"],
