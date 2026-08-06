@@ -14,6 +14,17 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
   <link href='https://fonts.googleapis.com/css?family=Oswald:700' rel='stylesheet' type='text/css'>
+  <style>
+    /* Below Bootstrap's md breakpoint the two columns stack in source order,
+       which buries the name, address and links under the whole page. Reorder
+       them on narrow screens only; at 992px and up nothing here applies and
+       the desktop layout is untouched. */
+    @media (max-width: 991px) {
+      .row-main { display: flex; flex-direction: column; }
+      .row-main > .col-md-4 { order: 1; }
+      .row-main > .col-md-8 { order: 2; }
+    }
+  </style>
 </head>
 <body>
 
@@ -46,7 +57,7 @@
   <!-- Page Content -->
     <div class="container">
 
-        <div class="row">
+        <div class="row row-main">
 
             <!-- Entries Column -->
             <div class="col-md-8" style="margin-top:0.225%">
