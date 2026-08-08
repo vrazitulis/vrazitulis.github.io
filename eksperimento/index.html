@@ -1744,18 +1744,74 @@ function render_finish(html) {
   jsPsych.getDisplayElement().innerHTML = html;
 }
 
-// The recruitment promise is a drink for taking part, redeemed in person, so the
-// code has to survive the participant closing the page: it is shown large and the
-// screen asks for a screenshot. Both finish screens end with this block, and it is
-// the only place the code is displayed.
+// ---------------- drink code ----------------
+//
+// The recruitment promise is a drink for taking part, redeemed in person. Showing
+// the subject_id for that would tie a face to a row of data, so the drink code is a
+// SEPARATE identifier: drawn from fresh randomness, never written into the data
+// set, never uploaded, and shown only on the finish screen. Nothing anywhere
+// records which drink code went with which run, so handing one over at the bar
+// reveals nothing about that participant's responses.
+//
+// It still has to be checkable, or anyone could invent a code. The last three
+// characters are a keyed checksum over the first six, so a made-up string is
+// almost certainly rejected: tools/verify_drink_code.py recomputes it. The salt
+// sits in the page, which anyone can read, so this stops casual invention rather
+// than a determined forger. For the stakes involved that is the right trade.
+var DRINK_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";  // no O/0/I/1/L
+var DRINK_SALT = "eo-maze-trinkajxo-2026";
+var DRINK_PAYLOAD_LEN = 6;
+var DRINK_CHECK_LEN = 3;
+
+// FNV-1a, 32-bit. Kept to integer ops that JavaScript and Python agree on, so the
+// verifier can reproduce it exactly.
+function drink_checksum(payload) {
+  var s = DRINK_SALT + payload;
+  var h = 0x811c9dc5;
+  for (var i = 0; i < s.length; i++) {
+    h = (h ^ s.charCodeAt(i)) >>> 0;
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  var out = "";
+  for (var k = 0; k < DRINK_CHECK_LEN; k++) {
+    out += DRINK_ALPHABET.charAt(h % DRINK_ALPHABET.length);
+    h = Math.floor(h / DRINK_ALPHABET.length);
+  }
+  return out;
+}
+
+// crypto.getRandomValues, not Math.random: the list-assignment fallback is the
+// first Math.random() call on the page and a test harness stubs it, so drawing
+// the code from that stream would both skew the code and break the harness.
+function make_drink_code() {
+  var n = DRINK_PAYLOAD_LEN;
+  var r = new Uint32Array(n);
+  if (window.crypto && window.crypto.getRandomValues) {
+    window.crypto.getRandomValues(r);
+  } else {
+    for (var i = 0; i < n; i++) r[i] = Math.floor(Math.random() * 4294967296);
+  }
+  var payload = "";
+  for (var j = 0; j < n; j++) {
+    payload += DRINK_ALPHABET.charAt(r[j] % DRINK_ALPHABET.length);
+  }
+  return payload + "-" + drink_checksum(payload);
+}
+
+// Generated on first display and held in a local variable only: a reload issues a
+// new code, which costs nothing, and no copy is kept for the data to pick up.
+var DRINK_CODE = null;
 function drink_notice() {
+  if (!DRINK_CODE) DRINK_CODE = make_drink_code();
   return (
     '<div class="maze-drink-notice">' +
     '<b>Kaj nun la trinkaĵo!</b><br/><br/>' +
     'Mi promesis doni trinkaĵon al ĉiu, kiu partoprenis. Jen via kodo:' +
-    '<div class="maze-drink-code">' + SUBJECT_ID + '</div>' +
+    '<div class="maze-drink-code">' + DRINK_CODE + '</div>' +
     'Vi povas fari <b>ekrankopion de ĉi tiu paĝo</b> aŭ simple <b>kopii la kodon</b>, ' +
     'kaj montri ĝin al mi en la trinkejo. ' +
+    'Ĝi estas anonima: ĝi ne estas konservita kun viaj respondoj, do mi ne povas ' +
+    'vidi, kiuj respondoj estas viaj.<br/><br/>' +
     'Post la fermo de la paĝo la kodo ne plu videblos.' +
     '</div>'
   );
@@ -1958,11 +2014,11 @@ function maze_word_trial(sent, w, w_idx, tally) {
       trial.stimulus_left = sides[0]; trial.stimulus_right = sides[1];
       trial.Target = w.t; trial.Distractor = w.d;
     },
-    choices: ["e", "i"],
+    choices: ["1", "2"],
     on_finish: function() {
       var data = jsPsych.data.get().last(1).values()[0];
-      data.correct = ((jsPsych.pluginAPI.compareKeys(data.stimulus_left, data.Target) && data.response == "e") ||
-                      (jsPsych.pluginAPI.compareKeys(data.stimulus_right, data.Target) && data.response == "i")) ? 1 : 0;
+      data.correct = ((jsPsych.pluginAPI.compareKeys(data.stimulus_left, data.Target) && data.response == "1") ||
+                      (jsPsych.pluginAPI.compareKeys(data.stimulus_right, data.Target) && data.response == "2")) ? 1 : 0;
       rename_options(data);
       data.sentence_id = sent.id;
       data.sentence_type = sent.type;
@@ -1983,9 +2039,9 @@ function rename_options(data) {
   data.stimulus_lower = data.stimulus_right;
   delete data.stimulus_left;
   delete data.stimulus_right;
-  // the plugin reports which key the response maps to ("e"/"i"); the CSV names
+  // the plugin reports which key the response maps to ("1"/"2"); the CSV names
   // the slot that was chosen. Scoring above has already run on the raw value.
-  data.response = data.response === "e" ? "upper" : "lower";
+  data.response = data.response === "1" ? "upper" : "lower";
 }
 
 function last_correct() {
@@ -2011,11 +2067,11 @@ function question_trial(sent) {
       trial.stimulus_left = r[0]; trial.stimulus_right = r[1];
       trial.Target = sent.q.target; trial.Distractor = sent.q.distractor;
     },
-    choices: ["e", "i"],
+    choices: ["1", "2"],
     on_finish: function() {
       var data = jsPsych.data.get().last(1).values()[0];
-      data.correct = ((jsPsych.pluginAPI.compareKeys(data.stimulus_left, data.Target) && data.response == "e") ||
-                      (jsPsych.pluginAPI.compareKeys(data.stimulus_right, data.Target) && data.response == "i")) ? 1 : 0;
+      data.correct = ((jsPsych.pluginAPI.compareKeys(data.stimulus_left, data.Target) && data.response == "1") ||
+                      (jsPsych.pluginAPI.compareKeys(data.stimulus_right, data.Target) && data.response == "2")) ? 1 : 0;
       rename_options(data);
       data.sentence_id = sent.id;
       data.sentence_type = sent.type;
