@@ -1974,6 +1974,10 @@ function question_trial(sent) {
       // "role" questions probe who did what to whom, i.e. whether the garden
       // path was recovered from; "detail" ones probe an adverb or a reason
       data.question_type = sent.q.type || "";
+      // the wording and its expected answer travel with the response, so the
+      // data set can be scored without the materials file alongside it
+      data.question_text = sent.q.question;
+      data.question_answer = sent.q.target;
       data.trial1 = "comprehension";
     }
   };
