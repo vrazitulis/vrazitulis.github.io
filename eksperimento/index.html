@@ -575,6 +575,39 @@ relative progress {
   text-align: center;
 }
 
+/* The participation code, which the participant has to keep to claim the drink.
+   Same box as the finish message, warmer, with the code big enough to survive a
+   screenshot scaled down in a messaging app. */
+.maze-drink-notice {
+  max-width: 65ch;
+  margin: 12px auto;
+  padding: 14px 18px;
+  background: #fffaf0;
+  border: 2px solid #e0b050;
+  border-radius: 12px;
+  font-size: 13pt;
+  line-height: 1.5;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.maze-drink-code {
+  font-family: monospace;
+  font-size: 26px;
+  font-weight: bold;
+  letter-spacing: 3px;
+  word-break: break-all;
+  /* one long-press selects the whole code, for participants who copy it
+     instead of taking a screenshot */
+  -webkit-user-select: all;
+  user-select: all;
+  margin: 14px 0;
+  padding: 10px 6px;
+  background: #ffffff;
+  border: 1px dashed #b08020;
+  border-radius: 8px;
+}
+
 #jspsych-data-display {
   max-width: 95vw;
   overflow-x: auto;
@@ -1711,6 +1744,23 @@ function render_finish(html) {
   jsPsych.getDisplayElement().innerHTML = html;
 }
 
+// The recruitment promise is a drink for taking part, redeemed in person, so the
+// code has to survive the participant closing the page: it is shown large and the
+// screen asks for a screenshot. Both finish screens end with this block, and it is
+// the only place the code is displayed.
+function drink_notice() {
+  return (
+    '<div class="maze-drink-notice">' +
+    '<b>Kaj nun la trinkaĵo!</b><br/><br/>' +
+    'Mi promesis doni trinkaĵon al ĉiu, kiu partoprenis. Jen via kodo:' +
+    '<div class="maze-drink-code">' + SUBJECT_ID + '</div>' +
+    'Vi povas fari <b>ekrankopion de ĉi tiu paĝo</b> aŭ simple <b>kopii la kodon</b>, ' +
+    'kaj montri ĝin al mi en la trinkejo. ' +
+    'Post la fermo de la paĝo la kodo ne plu videblos.' +
+    '</div>'
+  );
+}
+
 // CSV fallback: shown when there is no DataPipe ID, or when every upload attempt
 // failed. On a configured build the participant never reaches this screen.
 function show_csv_fallback(reason) {
@@ -1719,8 +1769,8 @@ function show_csv_fallback(reason) {
     (reason ? '<span style="color:#b00">' + reason + '</span><br/><br/>' : '') +
     'Se vi volas, vi povas <b>elŝuti la datumojn</b> kaj sendi la dosieron al ' +
     '<a href="mailto:' + STUDY_CONTACT_EMAIL + '">' + STUDY_CONTACT_EMAIL + '</a>. ' +
-    'Tio estas tute libervola.<br/>' +
-    'Via kodo: <b>' + SUBJECT_ID + '</b></div>' +
+    'Tio estas tute libervola.</div>' +
+    drink_notice() +
     '<div style="text-align:center; margin-top:16px;">' +
     '<button id="download-btn" class="jspsych-btn">Elŝuti la datumojn (CSV)</button> ' +
     '<button id="show-btn" class="jspsych-btn">Montri la datumojn</button> ' +
@@ -1802,8 +1852,8 @@ function save_data(attempt) {
   post_data().then(function() {
     render_finish(
       '<div class="maze-finish-message"><b>Fino de la eksperimento &mdash; koran dankon!</b><br/><br/>' +
-      'Viaj respondoj estas sekure konservitaj. Vi povas nun fermi la paĝon.<br/><br/>' +
-      'Via kodo: <b>' + SUBJECT_ID + '</b></div>'
+      'Viaj respondoj estas sekure konservitaj. Vi povas nun fermi la paĝon.</div>' +
+      drink_notice()
     );
   }).catch(function(err) {
     if (attempt < UPLOAD_ATTEMPTS) {
