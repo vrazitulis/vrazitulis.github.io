@@ -1458,7 +1458,8 @@ var ses_items = [
 // which is inlined after this file and calls build_intake_timeline(jsPsych).
 
 // ---------------------------------------------------------------------------
-// EDIT THESE TWO before recruiting: they appear on the consent screen.
+// Shown on the consent screen. Both are set; change them only if the study
+// moves institution or contact address.
 // ---------------------------------------------------------------------------
 var STUDY_INSTITUTION = "Universitato de Pocdamo";
 var STUDY_CONTACT_EMAIL = "vrazitulis@uni-potsdam.de";
@@ -1627,11 +1628,11 @@ function build_ses_timeline(jsPsych, position) {
           ? "Antaŭ la ĉefa parto ni petas vin fari mallongan <b>gramatikan teston</b>.<br/><br/>"
           : "Restas ankoraŭ mallonga <b>gramatika testo</b>.<br/><br/>") +
         "Vi vidos <b>25 frazojn</b>. En ĉiu frazo io mankas. Sub la frazo aperos " +
-        "<b>kvar proponoj</b>: <b>tuŝu</b> tiun, kiu estas " +
+        "<b>kvar proponoj</b>. <b>Tuŝu</b> tiun, kiu estas " +
         "<b>ĝusta</b>.<br/><br/>" +
         "Estas nur <b>unu</b> ĝusta respondo. Se vi ne certas, elektu tiun, kiu ŝajnas al " +
         "vi la plej bona.",
-      "Bonvolu <b>ne uzi vortarojn nek aliajn helpilojn</b>: ni volas mezuri vian " +
+      "Bonvolu <b>ne uzi vortarojn nek aliajn helpilojn</b>. Ni volas mezuri vian " +
         "propran spontanean lingvokonon.<br/><br/>" +
         "Ne eblas reveni al antaŭa demando.<br/><br/>" +
         "Ĉi tiu parto daŭras ĉirkaŭ <b>5&ndash;8 minutojn</b>.",
@@ -1688,7 +1689,7 @@ function build_ses_timeline(jsPsych, position) {
     pages: [
       "Fino de la lingva testo &mdash; dankon!<br/><br/>" +
         (position === "before"
-          ? "Nun sekvos la <b>ĉefa parto</b>: la legekzerco."
+          ? "Nun sekvos la <b>ĉefa parto</b>, la legekzerco."
           : "Tio estis la lasta parto."),
     ],
     show_clickable_nav: true,
@@ -1810,7 +1811,7 @@ function drink_notice() {
     '<div class="maze-drink-code">' + DRINK_CODE + '</div>' +
     'Vi povas fari <b>ekrankopion de ĉi tiu paĝo</b> aŭ simple <b>kopii la kodon</b>, ' +
     'kaj montri ĝin al mi en la trinkejo. ' +
-    'Ĝi estas anonima: ĝi ne estas konservita kun viaj respondoj, do mi ne povas ' +
+    'Ĝi estas anonima kaj ne estas konservita kun viaj respondoj, do mi ne povas ' +
     'vidi, kiuj respondoj estas viaj.<br/><br/>' +
     'Post la fermo de la paĝo la kodo ne plu videblos.' +
     '</div>'
@@ -2126,14 +2127,14 @@ function start(list, list_source) {
     type: jsPsychInstructions,
     data: { trial1: "instructions" },
     pages: [
-      "<b>Bonvenon al la labirinta legeksperimento!</b><br/><br/>Vi legos frazojn po unu vorto.<br/><br/>Sur ĉiu ekrano aperos <b>du vortoj</b>: unu ĝuste daŭrigas la frazon, la alia ne.<br/><br/><b>Tuŝu</b> la vorton, kiu daŭrigas la frazon.<br/><br/>Se vi elektos malĝuste, aperos ruĝa <b style='color:red'>x</b> kaj vi povos provi denove.",
+      "<b>Bonvenon al la labirinta legeksperimento!</b><br/><br/>Vi legos frazojn po unu vorto.<br/><br/>Sur ĉiu ekrano aperos <b>du vortoj</b>. Unu ĝuste daŭrigas la frazon, la alia ne.<br/><br/><b>Tuŝu</b> la vorton, kiu daŭrigas la frazon.<br/><br/>Se vi elektos malĝuste, aperos ruĝa <b style='color:red'>x</b> kaj vi povos provi denove.",
       // the standard Maze speed-accuracy instruction (Forster et al. 2009: as fast
       // as possible, but not so fast that mistakes happen)
       "Elektu <b>kiel eble plej rapide</b>, sed ne tiel rapide, ke vi eraras.<br/><br/>" +
-        "Ne longe cerbumu pri unuopa vorto: kutime la ĝusta vorto tuj videblas. " +
+        "Ne longe cerbumu pri unuopa vorto. Kutime la ĝusta vorto tuj videblas. " +
         "Fidu vian unuan impreson kaj legu je via <b>natura legrapido</b>, kvazaŭ vi legus ordinaran tekston.<br/><br/>" +
         "Ni mezuras, kiom da tempo vi bezonas por ĉiu vorto, do gravas respondi flue kaj sen halti.",
-      "Post kelkaj frazoj aperos <b>demando</b> pri la enhavo: tuŝu la ĝustan respondon.<br/><br/>Ĉi tiu parto daŭras ĉirkaŭ <b>12&ndash;15 minutojn</b>.",
+      "Post kelkaj frazoj aperos <b>demando</b> pri la enhavo. Tuŝu la ĝustan respondon.<br/><br/>Ĉi tiu parto daŭras ĉirkaŭ <b>12&ndash;15 minutojn</b>.",
       "<b>Antaŭ ol komenci</b><br/><br/>" +
         "Bonvolu ŝalti sur via telefono la reĝimon <b>&bdquo;Ne ĝeni&ldquo;</b> " +
         "(en Android: <i>Ne ĝeni</i> / <i>Do Not Disturb</i>; en iPhone: " +
@@ -2163,7 +2164,7 @@ function start(list, list_source) {
         type: jsPsychInstructions,
         data: { trial1: "instructions" },
         pages: ["Fino de la ekzercado.<br/><br/>Nun komenciĝas la <b>ĉefa parto</b>.<br/><br/>" +
-                "Memoru: elektu <b>rapide sed zorge</b>, sen longa pripensado."],
+                "Memoru, elektu <b>rapide sed zorge</b>, sen longa pripensado."],
         show_clickable_nav: true, allow_backward: false, allow_keys: false,
         button_label_next: "Komenci"
       });
