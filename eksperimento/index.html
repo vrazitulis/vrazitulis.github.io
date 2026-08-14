@@ -1561,6 +1561,17 @@ function build_consent_timeline(jsPsych) {
         placeholder: "ekz. 34",
       },
       {
+        name: "gender",
+        label: "Kia estas via genro?",
+        type: "select",
+        options: [
+          { value: "ina", label: "Ina" },
+          { value: "ica", label: "Iĉa (vira)" },
+          { value: "alia", label: "Alia" },
+          { value: "ne_dirita", label: "Preferas ne diri" },
+        ],
+      },
+      {
         name: "native_language",
         label: "Kiu estas via denaska lingvo (aŭ lingvoj)?",
         type: "text",
@@ -1599,6 +1610,7 @@ function build_consent_timeline(jsPsych) {
     on_finish: function (data) {
       jsPsych.data.addProperties({
         age: data.age,
+        gender: data.gender,
         native_language: data.native_language,
         denaskulo: data.denaskulo,
         years_esperanto: data.years_esperanto,
