@@ -575,10 +575,9 @@ relative progress {
   text-align: center;
 }
 
-/* The participation code, which the participant has to keep to claim the drink.
-   Same box as the finish message, warmer, with the code big enough to survive a
-   screenshot scaled down in a messaging app. */
-.maze-drink-notice {
+/* Thanks and contact details, closing both finish screens. Same box as the finish
+   message, warmer, so the two read as one panel rather than a page of small print. */
+.maze-contact-notice {
   max-width: 65ch;
   margin: 12px auto;
   padding: 14px 18px;
@@ -589,23 +588,6 @@ relative progress {
   line-height: 1.5;
   text-align: center;
   box-sizing: border-box;
-}
-
-.maze-drink-code {
-  font-family: monospace;
-  font-size: 26px;
-  font-weight: bold;
-  letter-spacing: 3px;
-  word-break: break-all;
-  /* one long-press selects the whole code, for participants who copy it
-     instead of taking a screenshot */
-  -webkit-user-select: all;
-  user-select: all;
-  margin: 14px 0;
-  padding: 10px 6px;
-  background: #ffffff;
-  border: 1px dashed #b08020;
-  border-radius: 8px;
 }
 
 #jspsych-data-display {
@@ -1756,20 +1738,24 @@ function render_finish(html) {
   jsPsych.getDisplayElement().innerHTML = html;
 }
 
-// ---------------- drink code ----------------
+// ---------------- drink code (dormant) ----------------
 //
-// The recruitment promise is a drink for taking part, redeemed in person. Showing
-// the subject_id for that would tie a face to a row of data, so the drink code is a
-// SEPARATE identifier: drawn from fresh randomness, never written into the data
-// set, never uploaded, and shown only on the finish screen. Nothing anywhere
-// records which drink code went with which run, so handing one over at the bar
-// reveals nothing about that participant's responses.
+// Nothing calls any of this. It served the IJK 2027 round, where taking part was
+// paid for with a drink at the bar: the participant had to leave the run with
+// something to show, and showing the subject_id would have tied a face to a row of
+// data, so the code was a SEPARATE identifier -- fresh randomness, never written
+// into the data set, never uploaded, displayed once and kept nowhere. Handing one
+// over at the bar therefore revealed nothing about that participant's responses.
 //
-// It still has to be checkable, or anyone could invent a code. The last three
-// characters are a keyed checksum over the first six, so a made-up string is
-// almost certainly rejected: tools/verify_drink_code.py recomputes it. The salt
-// sits in the page, which anyone can read, so this stops casual invention rather
-// than a determined forger. For the stakes involved that is the right trade.
+// A code also had to be checkable, or anyone could invent one: the last three
+// characters are a keyed checksum over the first six, which tools/verify_drink_code.py
+// recomputes. The salt sits in the page, so this stopped casual invention rather
+// than a determined forger, which was the right trade for the stake.
+//
+// Recruitment is online now and offers no reward, so the finish screen shows no
+// code (see contact_notice). The pair is kept because reviving an in-person round
+// means re-enabling it, not rewriting it -- and drink_checksum() must stay in step
+// with the Python if that day comes.
 var DRINK_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";  // no O/0/I/1/L
 var DRINK_SALT = "eo-maze-trinkajxo-2026";
 var DRINK_PAYLOAD_LEN = 6;
@@ -1810,23 +1796,17 @@ function make_drink_code() {
   return payload + "-" + drink_checksum(payload);
 }
 
-// Generated on first display and held in a local variable only: a reload issues a
-// new code, which costs nothing, and no copy is kept for the data to pick up.
-var DRINK_CODE = null;
-function drink_notice() {
-  if (!DRINK_CODE) DRINK_CODE = make_drink_code();
+// Closes both finish screens: thanks, what the participation was for, and how to
+// reach the experimenter. There is no reward and nothing to keep, so the screen
+// asks the participant for nothing at all.
+function contact_notice() {
   return (
-    '<div class="maze-drink-notice">' +
-    '<b>Kaj nun la trinkaĵo!</b><br/><br/>' +
-    'Mi promesis pagi trinkaĵon al ĉiu, kiu partoprenis. Jen via kodo:' +
-    '<div class="maze-drink-code">' + DRINK_CODE + '</div>' +
-    'Vi povas fari <b>ekrankopion de ĉi tiu paĝo</b> aŭ simple <b>kopii la kodon</b>, ' +
-    'kaj montri ĝin al mi en la trinkejo. ' +
-    'Ĝi estas anonima kaj ne estas konservita kun viaj respondoj, do mi ne povas ' +
-    'vidi, kiuj respondoj estas viaj.<br/><br/>' +
-    'Post la fermo de la paĝo la kodo ne plu videblos.<br/><br/>' +
-    'Mi estas <b>Michael Vrazitulis el Germanio</b>. Se vi ne trovas min en la ' +
-    'trinkejo, kontaktu min: <a href="mailto:' + STUDY_CONTACT_EMAIL + '">' +
+    '<div class="maze-contact-notice">' +
+    '<b>Pri la esploro</b><br/><br/>' +
+    'Via partopreno estis tute libervola kaj senpaga. Ĝi helpas esploron pri tio, ' +
+    'kiel oni legas kaj komprenas Esperanton.<br/><br/>' +
+    'Mi estas <b>Michael Vrazitulis el Germanio</b>. Se vi havas demandojn pri la ' +
+    'esploro, skribu al mi: <a href="mailto:' + STUDY_CONTACT_EMAIL + '">' +
     STUDY_CONTACT_EMAIL + '</a> aŭ per Telegram <b>@mixalhs</b>.' +
     '</div>'
   );
@@ -1841,7 +1821,7 @@ function show_csv_fallback(reason) {
     'Se vi volas, vi povas <b>elŝuti la datumojn</b> kaj sendi la dosieron al ' +
     '<a href="mailto:' + STUDY_CONTACT_EMAIL + '">' + STUDY_CONTACT_EMAIL + '</a>. ' +
     'Tio estas tute libervola.</div>' +
-    drink_notice() +
+    contact_notice() +
     '<div style="text-align:center; margin-top:16px;">' +
     '<button id="download-btn" class="jspsych-btn">Elŝuti la datumojn (CSV)</button> ' +
     '<button id="show-btn" class="jspsych-btn">Montri la datumojn</button> ' +
@@ -1924,7 +1904,7 @@ function save_data(attempt) {
     render_finish(
       '<div class="maze-finish-message"><b>Fino de la eksperimento &mdash; koran dankon!</b><br/><br/>' +
       'Viaj respondoj estas sekure konservitaj. Vi povas nun fermi la paĝon.</div>' +
-      drink_notice()
+      contact_notice()
     );
   }).catch(function(err) {
     if (attempt < UPLOAD_ATTEMPTS) {
